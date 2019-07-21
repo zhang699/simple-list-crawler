@@ -1,4 +1,4 @@
-const { launchPuppeteerCrawler } = require("../index");
+const { launch } = require("../index");
 const youratorConfig = {
   url: "https://www.yourator.co/companies",
   listItemContainer: "#y-company-list-cards > .container > .row .y-card",
@@ -19,5 +19,12 @@ const youratorConfig = {
 };
 
 (async () => {
-  await launchPuppeteerCrawler(youratorConfig);
+  let result = [];
+  const crawler = await launch();
+  await crawler.crawl(youratorConfig, ({ items, pagination }) => {
+    result = result.concat(items);
+    console.warn("currenat pagination", pagination);
+  });
+  await crawler.close();
+  console.warn("final result", result.length, result);
 })();

@@ -28,38 +28,58 @@ const formatAccordingConfig = ({ config }) => {
   return { status: true, result: formattedItems };
 };
 
-async function launchPuppeteerCrawler(config) {
-  function goTo(url, name, pageNum) {
-    return page.goto(`${url}?${name}=${pageNum}`);
+class PuppeteerCrawler {
+  constructor(
+    browser,
+    consoleHandler = msg => console.log("PuppeteerCrawler LOG:", msg.text())
+  ) {
+    this.browser = browser;
+    this.consoleHandler = consoleHandler;
   }
-  const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
-  page.on("console", consoleObj => console.log(consoleObj.text()));
-  let { pagination, url } = config;
-  const { urlQuery } = pagination;
-  await goTo(url, urlQuery.name, urlQuery.from);
-  let finish = false;
-  let final = [];
-  let currentPage = urlQuery.from;
-  while (!finish) {
-    const { status, result } = await page.evaluate(formatAccordingConfig, {
-      config
-    });
-    ++currentPage;
-    finish = status && currentPage > urlQuery.to;
-    if (status) {
-      final = final.concat(result);
-      await config.onBatchWrite(result);
-    }
-    if (finish) {
-      break;
-    }
+  close() {
+    return this.browser.close();
+  }
+  getBrowser() {
+    return this.browser;
+  }
+  async crawl(config, onBatchDone) {
+    const goTo = (url, name, pageNum) => {
+      return this.page.goto(`${url}?${name}=${pageNum}`);
+    };
+    this.page = await this.browser.newPage();
+    this.page.on("console", this.consoleHandler);
+    let { pagination, url } = config;
+    const { urlQuery } = pagination;
+    await goTo(url, urlQuery.name, urlQuery.from);
+    let finish = false;
+    let currentPage = urlQuery.from;
+    while (!finish) {
+      const { status, result } = await this.page.evaluate(
+        formatAccordingConfig,
+        {
+          config
+        }
+      );
 
-    await goTo(url, urlQuery.name, currentPage);
+      finish = status && currentPage + 1 > urlQuery.to;
+      if (status) {
+        await onBatchDone({
+          items: result,
+          pagination: { current: currentPage }
+        });
+      }
+      if (finish) {
+        break;
+      }
+
+      await goTo(url, urlQuery.name, ++currentPage);
+    }
   }
-  return final;
 }
 
-module.exports = {
-  launchPuppeteerCrawler
-};
+async function launch(puppeteerOptions = { headless: true }) {
+  const browser = await puppeteer.launch(puppeteerOptions);
+  return new PuppeteerCrawler(browser);
+}
+
+module.exports = { launch };
