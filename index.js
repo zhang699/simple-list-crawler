@@ -15,7 +15,7 @@ const formatAccordingConfig = ({ config }) => {
       const nodeResult = attrOrContentValues.reduce(
         (pre, attorContent) => ({
           ...pre,
-          [attorContent]: node[attorContent]
+          [attorContent]: node ? node[attorContent] : undefined
         }),
         {}
       );
@@ -72,7 +72,9 @@ class PuppeteerCrawler {
         break;
       }
 
-      await goTo(url, urlQuery.name, ++currentPage);
+      if (status) {
+        await goTo(url, urlQuery.name, ++currentPage);
+      }
     }
   }
 }

@@ -1,12 +1,15 @@
 const { launch } = require("../index");
 const youratorConfig = {
-  url: "https://www.yourator.co/companies",
-  listItemContainer: "#y-company-list-cards > .container > .row .y-card",
+  url: "https://meet.jobs/en/jobs?order=match",
+  listItemContainer: ".job-card",
   expectedListItemNotLessThan: 10,
   item: {
-    img: [".y-card-img > a > img", "src"],
-    title: [".y-card-content-title > a", "href", "text"],
-    descrption: [".y-card-content-description", "textContent"]
+    img: [".image-wrapper", "style"],
+    title: [".job-title", "textContent"],
+    salary: [".prices > .salary", "textContent"],
+    location: [".location", "innerText"],
+    primarySkill: [".box-items > li:nth-child(2)", "textContent"],
+    secondarySkill: [".box-items > li:nth-child(3)", "textContent"]
   },
   pagination: {
     urlQuery: {
