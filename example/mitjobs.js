@@ -1,5 +1,5 @@
 const { launch } = require("../index");
-const youratorConfig = {
+const mitJobConfig = {
   url: "https://meet.jobs/en/jobs?order=match",
   listItemContainer: ".job-card",
   expectedListItemNotLessThan: 10,
@@ -23,7 +23,7 @@ const youratorConfig = {
 (async () => {
   let result = [];
   const crawler = await launch();
-  await crawler.crawl(youratorConfig, ({ items, pagination }) => {
+  await crawler.crawl(mitJobConfig, ({ items, pagination }) => {
     result = result.concat(items);
     console.warn("currenat pagination", pagination);
   });
