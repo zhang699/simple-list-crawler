@@ -2,9 +2,11 @@
 
 Crawl list in website using Puppeteer with an easy configuration.
 
-## Getting started
+### Examples
 
-### Prepare the configuration according to your website
+see [examples](https://github.com/zhang699/simple-list-crawler)
+
+### Prepare the config according to your website
 
 ```js
 {
@@ -67,7 +69,7 @@ returned format is
 ]
 ```
 
-- the first value in the value's array is [selector](https://developer.mozilla.org/docs/Web/API/Document/querySelector) tell Puppeteer which field want to select. you can use browser's `inspector`to find out the selector. the key of item object is the will identical in the result item.
+- the first value in the value's array is [selector](https://developer.mozilla.org/docs/Web/API/Document/querySelector) tell Puppeteer which field want to select. you can use browser's `inspector`to find out the selector. the key of item object will identical in the result item.
 
 - the second one is DOMNode's property such as `textContent`, `alt` ... (if imageMode), reference to [HTMLHtmlElement Documentation](https://developer.mozilla.org/docs/Web/API/HTMLHtmlElement) for more detail
 
