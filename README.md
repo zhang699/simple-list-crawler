@@ -1,6 +1,6 @@
 # Simple List Crawler
 
-Crawl list in website using Puppeteer with an easy configuration.
+Crawl list in website using headless Puppeteer with an easy configuration.
 
 ### Examples
 

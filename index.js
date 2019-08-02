@@ -11,7 +11,6 @@ const formatAccordingConfig = ({ config }) => {
     return Object.keys(item).reduce((pre, itemConfigKey) => {
       const [itemSelector, ...attrOrContentValues] = item[itemConfigKey];
       const node = listItem.querySelector(itemSelector);
-
       const nodeResult = attrOrContentValues.reduce(
         (pre, attorContent) => ({
           ...pre,
@@ -54,6 +53,7 @@ class PuppeteerCrawler {
     let finish = false;
     let currentPage = urlQuery.from;
     while (!finish) {
+      await this.page.waitFor(config.delay || 1);
       const { status, result } = await this.page.evaluate(
         formatAccordingConfig,
         {
