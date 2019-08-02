@@ -8,6 +8,7 @@ const mitJobConfig = {
     title: [".job-title", "textContent"],
     salary: [".prices > .salary", "textContent"],
     location: [".location", "innerText"],
+    employerName: [".employer-name", "textContent"],
     primarySkill: [".box-items > li:nth-child(2)", "textContent"],
     secondarySkill: [".box-items > li:nth-child(3)", "textContent"]
   },
