@@ -1,5 +1,17 @@
 const puppeteer = require("puppeteer");
 
+function waitForFrame(page, name) {
+  let fulfill;
+  const promise = new Promise(x => (fulfill = x));
+  checkFrame();
+  return promise;
+
+  function checkFrame() {
+    const frame = page.frames().find(f => f.name() === name);
+    if (frame) fulfill(frame);
+    else page.once("frameattached", checkFrame);
+  }
+}
 const formatAccordingConfig = ({ config }) => {
   const { item, expectedListItemNotLessThan, listItemContainer } = config;
 
@@ -42,26 +54,38 @@ class PuppeteerCrawler {
     return this.browser;
   }
   async crawl(config, onBatchDone) {
-    const goTo = (url, name, pageNum) => {
-      return this.page.goto(`${url}?${name}=${pageNum}`);
+    const goTo = (url, name, pageNum, pageHandle = this.page) => {
+      if (name) {
+        return pageHandle.goto(`${url}?${name}=${pageNum}`);
+      }
+      return pageHandle.goto(`${url}`);
     };
     this.page = await this.browser.newPage();
     this.page.on("console", this.consoleHandler);
-    let { pagination, url } = config;
-    const { urlQuery } = pagination;
+    let currentPageHandle = this.page;
+    let { pagination = {}, url } = config;
+    const { urlQuery = { name: "" } } = pagination;
     await goTo(url, urlQuery.name, urlQuery.from);
     let finish = false;
     let currentPage = urlQuery.from;
+
     while (!finish) {
-      await this.page.waitFor(config.delay || 1);
-      const { status, result } = await this.page.evaluate(
+      if (config.waitFor) {
+        await this.page.waitForSelector(config.waitFor);
+      } else if (config.delay) {
+        await this.page.waitFor(config.delay || 1);
+      } else if (config.waitForFrame) {
+        const frame = await waitForFrame(this.page, config.waitForFrame);
+        currentPageHandle = frame;
+      }
+      const { status, result } = await currentPageHandle.evaluate(
         formatAccordingConfig,
         {
           config
         }
       );
 
-      finish = status && currentPage + 1 > urlQuery.to;
+      finish = !urlQuery.name || (status && currentPage + 1 > urlQuery.to);
       if (status) {
         await onBatchDone({
           items: result,
