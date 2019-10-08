@@ -4,7 +4,14 @@ Crawl list in website using headless Puppeteer with an easy configuration.
 
 ### Examples
 
-see [examples](https://github.com/zhang699/simple-list-crawler)
+see [examples](https://github.com/zhang699/simple-list-crawler/tree/master/example)
+
+example contain following sites:
+
+- [books](https://www.books.com.tw/)
+- [mitjobs](https://meet.jobs/zh-TW)
+- [cakeresume](https://www.cakeresume.com/)
+
 
 ### Prepare the config according to your website
 
